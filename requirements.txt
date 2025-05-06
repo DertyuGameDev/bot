@@ -1,5 +1,5 @@
 SQLAlchemy
-pathlib
+urllib3==1.26.15
 aiogram
 requests
 Flask
