@@ -10,6 +10,22 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from data.user import UserCard
 from config import BOT_TOKEN
 from data import db_session
+from aiohttp import web
+
+# # -*- coding: utf-8 -*-
+# import asyncio
+# import json
+# import logging
+# import urllib
+# from datetime import datetime
+# from aiogram import Bot, Dispatcher, types
+# from aiogram.dispatcher.filters import Command
+# from aiogram.dispatcher.filters.state import State, StatesGroup
+# from aiogram.contrib.fsm_storage.memory import MemoryStorage
+# from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+# from data.user import UserCard
+# from config import BOT_TOKEN
+# from data import db_session
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -18,6 +34,7 @@ logging.basicConfig(
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 db_session.global_init('db/love.db')
+routes = web.RouteTableDef()
 
 
 @dp.message(Command('start'))
@@ -36,11 +53,11 @@ async def prepare_link(message):
     json_str = json.dumps(payload)
     encoded = urllib.parse.quote(json_str)
     url = f"https://olivine-level-surprise.glitch.me/?data={encoded}"
-    inline_kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='🚀 Открыть Web App', web_app=WebAppInfo(url=url))]
-    ])
+    inline_kb = InlineKeyboardMarkup()
+    inline_kb.add(InlineKeyboardButton(text=u'🚀 Открыть Web App', url=url))
+
     await message.answer(
-        "Привет! 👋\nНажми кнопку ниже, чтобы открыть наше веб-приложение:",
+        u"Привет! 👋\nНажми кнопку ниже, чтобы открыть наше веб-приложение:",
         reply_markup=inline_kb
     )
 
@@ -111,3 +128,34 @@ async def get_user_avatar(message):
 
 async def main():
     await dp.start_polling(bot)
+
+
+@routes.post("/json")
+async def handle_json(request):
+    try:
+        data = await request.json()
+        logging.info(f"Got JSON: {data}")
+        await message_like(data)
+        return web.json_response({"status": "ok"})
+    except Exception as e:
+        logging.exception("Error handling JSON:")
+        return web.json_response({"status": "error", "message": str(e)}, status=500)
+
+
+async def start():
+    app = web.Application()
+    app.add_routes(routes)
+
+    loop = asyncio.get_event_loop()
+    await loop.create_task(dp.start_polling(bot))
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", 3000)
+    await site.start()
+    print("Server started on http://0.0.0.0:3000")
+
+
+# запуск
+if __name__ == "__main__":
+    asyncio.run(start())
