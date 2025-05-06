@@ -1,0 +1,5 @@
+SQLAlchemy
+pathlib
+aiogram
+requests
+Flask
