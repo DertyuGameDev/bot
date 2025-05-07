@@ -38,7 +38,7 @@ dp = Dispatcher()
 # API_URL = 'https://imminent-jet-suggestion.glitch.me'
 API_URL = "http://127.0.0.1:5000"
 routes = web.RouteTableDef()
-start_button = [
+start_button_not_online = [
     [
         KeyboardButton(text="/start")
     ],
@@ -47,6 +47,26 @@ start_button = [
     ],
     [
         KeyboardButton(text="/edit_profile")
+    ],
+    [
+        KeyboardButton(text="/set_online")
+    ],
+    [
+        KeyboardButton(text="/stop")
+    ]
+]
+start_button_not_offline = [
+    [
+        KeyboardButton(text="/start")
+    ],
+    [
+        KeyboardButton(text="/help")
+    ],
+    [
+        KeyboardButton(text="/edit_profile")
+    ],
+    [
+        KeyboardButton(text="/set_offline")
     ],
     [
         KeyboardButton(text="/stop")
@@ -70,7 +90,8 @@ edit_user_buttons = [
         KeyboardButton(text="/end_edit_profile")
     ]
 ]
-kb = ReplyKeyboardMarkup(keyboard=start_button, resize_keyboard=True, one_time_keyboard=False)
+kb_online = ReplyKeyboardMarkup(keyboard=start_button_not_online, resize_keyboard=True, one_time_keyboard=False)
+kb_offline = ReplyKeyboardMarkup(keyboard=start_button_not_offline, resize_keyboard=True, one_time_keyboard=False)
 user_kb = ReplyKeyboardMarkup(keyboard=edit_user_buttons, resize_keyboard=True, one_time_keyboard=False)
 
 
@@ -141,7 +162,7 @@ async def update_name(message: types.Message, state):
 @dp.message(Command("end_edit_profile"))
 async def end_edit_profile(message: types.Message, state):
     await state.clear()
-    await message.answer("Все данные успешно обновлены!", reply_markup=kb)
+    await message.answer("Все данные успешно обновлены!", reply_markup=kb_online)
 
 
 @dp.message(Command("picture"))
@@ -178,6 +199,20 @@ async def edit_description(message: types.Message, state):
     await state.set_state(WaitNewDescription.wait_description)
 
 
+@dp.message(Command("set_online"))
+async def set_online(message: types.Message):
+    res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": True}).json()
+    await message.answer("Описать, что произошло", reply_markup=ReplyKeyboardRemove())
+    await message.answer("Теперь вас видят другие пользователи", reply_markup=kb_offline)
+
+
+@dp.message(Command("set_offline"))
+async def set_offline(message: types.Message):
+    res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": False}).json()
+    await message.answer("Описать, что произошло", reply_markup=ReplyKeyboardRemove())
+    await message.answer("Теперь вас не видят другие пользователи", reply_markup=kb_online)
+
+
 class WaitNewDescription(StatesGroup):
     wait_description = State()
 
@@ -208,7 +243,7 @@ async def prepare_link(message, new_user=False):
             reply_markup=inline_kb
         )
     else:
-        await message.answer(u"Привет! 👋", reply_markup=kb)
+        await message.answer(u"Привет! 👋", reply_markup=kb_online)
         await message.answer(
             u"Нажми кнопку ниже, чтобы открыть наше веб-приложение:",
             reply_markup=inline_kb
@@ -234,7 +269,7 @@ class BirthdateForm(StatesGroup):
 
 
 async def ask_birthdate(message: types.Message, state):
-    await message.answer("Привет! Скажи сколько тебе лет.", reply_markup=kb)
+    await message.answer("Привет! Скажи сколько тебе лет.", reply_markup=kb_online)
     await state.set_state(BirthdateForm.waiting_for_birthdate)
 
 
