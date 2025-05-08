@@ -316,33 +316,24 @@ async def get_user_avatar(message):
     return file_name
 
 
-async def main():
-    await dp.start_polling(bot)
-
-
-@routes.post("/json")
-async def handle_json(request):
-    try:
-        print(await request.json())
-        data = request.json
-        logging.info(f"Got JSON: {data}")
-        await message_like(data)
-        return web.json_response({"status": "ok"})
-    except Exception as e:
-        logging.exception("Error handling JSON:")
-        return web.json_response({"status": "error", "message": str(e)}, status=500)
+async def poll_server_for_events():
+    while True:
+        try:
+            response = requests.get(f"{API_URL}/get_events")
+            if response.status_code == 200:
+                data = response.json()
+                for event in data.get("events", []):
+                    await message_like(event)
+        except Exception as e:
+            logging.error(f"Ошибка при опросе сервера: {e}")
+        await asyncio.sleep(5)
 
 
 async def start():
-    app = web.Application()
-    app.add_routes(routes)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, "127.0.0.1", 3000)
-    await site.start()
-    print("Server started on http://127.0.0.1:3000")
-    loop = asyncio.get_event_loop()
-    await loop.create_task(dp.start_polling(bot))
+    await asyncio.gather(
+        poll_server_for_events(),
+        dp.start_polling(bot)
+    )
 
 
 if __name__ == "__main__":
