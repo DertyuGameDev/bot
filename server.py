@@ -36,7 +36,7 @@ logging.basicConfig(
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 # API_URL = 'https://imminent-jet-suggestion.glitch.me'
-API_URL = "http://127.0.0.1:5000"
+API_URL = "https://simple-slender-basement.glitch.me/"
 routes = web.RouteTableDef()
 start_button_not_online = [
     [
