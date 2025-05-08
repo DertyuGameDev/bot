@@ -328,7 +328,7 @@ async def main():
 async def handle_json(request):
     try:
         print(await request.json())
-        data = await request.json()
+        data = request.json
         logging.info(f"Got JSON: {data}")
         await message_like(data)
         return web.json_response({"status": "ok"})
