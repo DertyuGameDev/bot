@@ -201,14 +201,14 @@ async def edit_description(message: types.Message, state):
 
 @dp.message(Command("set_online"))
 async def set_online(message: types.Message):
-    res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": True}).json()
+    res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": False}).json()
     await message.answer("Описать, что произошло", reply_markup=ReplyKeyboardRemove())
     await message.answer("Теперь вас видят другие пользователи", reply_markup=kb_offline)
 
 
 @dp.message(Command("set_offline"))
 async def set_offline(message: types.Message):
-    res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": False}).json()
+    res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": True}).json()
     await message.answer("Описать, что произошло", reply_markup=ReplyKeyboardRemove())
     await message.answer("Теперь вас не видят другие пользователи", reply_markup=kb_online)
 
@@ -327,6 +327,7 @@ async def main():
 @routes.post("/json")
 async def handle_json(request):
     try:
+        print(await request.json())
         data = await request.json()
         logging.info(f"Got JSON: {data}")
         await message_like(data)
@@ -341,9 +342,9 @@ async def start():
     app.add_routes(routes)
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", 3000)
+    site = web.TCPSite(runner, "127.0.0.1", 3000)
     await site.start()
-    print("Server started on http://0.0.0.0:3000")
+    print("Server started on http://127.0.0.1:3000")
     loop = asyncio.get_event_loop()
     await loop.create_task(dp.start_polling(bot))
 
