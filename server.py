@@ -29,14 +29,10 @@ from config import BOT_TOKEN
 from data import db_session
 from aiohttp import web
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.DEBUG
-)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 # API_URL = 'https://imminent-jet-suggestion.glitch.me'
-API_URL = "https://simple-slender-basement.glitch.me/"
+API_URL = "https://thankful-iris-jam.glitch.me"
 routes = web.RouteTableDef()
 start_button_not_online = [
     [
