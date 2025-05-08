@@ -32,7 +32,7 @@ from aiohttp import web
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 # API_URL = 'https://imminent-jet-suggestion.glitch.me'
-API_URL = "https://reliable-harvest-barracuda.glitch.me"
+API_URL = "https://cultured-ring-dog.glitch.me"
 routes = web.RouteTableDef()
 start_button_not_online = [
     [
