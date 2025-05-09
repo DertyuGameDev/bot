@@ -47,9 +47,6 @@ start_button_for_offline_user = [
     ],
     [
         KeyboardButton(text="Выйти из тени")
-    ],
-    [
-        KeyboardButton(text="/stop")
     ]
 ]
 start_button_for_online_user = [
@@ -64,9 +61,6 @@ start_button_for_online_user = [
     ],
     [
         KeyboardButton(text="Уйти в тень")
-    ],
-    [
-        KeyboardButton(text="/stop")
     ]
 ]
 edit_user_buttons = [
@@ -87,8 +81,8 @@ edit_user_buttons = [
         KeyboardButton(text="/end_edit_profile")
     ]
 ]
-kb_online = ReplyKeyboardMarkup(keyboard=start_button_for_offline_user, resize_keyboard=True, one_time_keyboard=False)
-kb_offline = ReplyKeyboardMarkup(keyboard=start_button_for_online_user, resize_keyboard=True, one_time_keyboard=False)
+kb_online = ReplyKeyboardMarkup(keyboard=start_button_for_online_user, resize_keyboard=True, one_time_keyboard=False)
+kb_offline = ReplyKeyboardMarkup(keyboard=start_button_for_offline_user, resize_keyboard=True, one_time_keyboard=False)
 user_kb = ReplyKeyboardMarkup(keyboard=edit_user_buttons, resize_keyboard=True, one_time_keyboard=False)
 
 
@@ -200,14 +194,14 @@ async def edit_description(message: types.Message, state):
 async def set_online(message: types.Message):
     res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": False}).json()
     await message.answer("Описать, что произошло", reply_markup=ReplyKeyboardRemove())
-    await message.answer("Теперь вас видят другие пользователи", reply_markup=kb_offline)
+    await message.answer("Теперь вас видят другие пользователи", reply_markup=kb_online)
 
 
 @dp.message(Command("set_offline"))
 async def set_offline(message: types.Message):
     res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": True}).json()
     await message.answer("Описать, что произошло", reply_markup=ReplyKeyboardRemove())
-    await message.answer("Теперь вас не видят другие пользователи", reply_markup=kb_online)
+    await message.answer("Теперь вас не видят другие пользователи", reply_markup=kb_offline)
 
 
 class WaitNewDescription(StatesGroup):
@@ -335,6 +329,18 @@ async def start():
         poll_server_for_events(),
         dp.start_polling(bot)
     )
+
+@dp.message()
+async def test(message: types.Message):
+    print(message.text)
+    if message.text == "Помощь":
+        await bot_help(message)
+    elif message.text == "Редактировать профиль":
+        await edit_user_info(message)
+    elif message.text == "Выйти из тени":
+        await set_online(message)
+    elif message.text == "Уйти в тень":
+        await set_offline(message)
 
 
 if __name__ == "__main__":
