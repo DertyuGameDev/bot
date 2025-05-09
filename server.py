@@ -32,37 +32,38 @@ from aiohttp import web
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 # API_URL = 'https://imminent-jet-suggestion.glitch.me'
-API_URL = "https://cultured-ring-dog.glitch.me"
+# API_URL = "https://cultured-ring-dog.glitch.me"
+API_URL = "http://127.0.0.1:5000"
 routes = web.RouteTableDef()
-start_button_not_online = [
+start_button_for_offline_user = [
     [
         KeyboardButton(text="/start")
     ],
     [
-        KeyboardButton(text="/help")
+        KeyboardButton(text="Помощь")
     ],
     [
-        KeyboardButton(text="/edit_profile")
+        KeyboardButton(text="Редактировать профиль")
     ],
     [
-        KeyboardButton(text="/set_online")
+        KeyboardButton(text="Выйти из тени")
     ],
     [
         KeyboardButton(text="/stop")
     ]
 ]
-start_button_not_offline = [
+start_button_for_online_user = [
     [
         KeyboardButton(text="/start")
     ],
     [
-        KeyboardButton(text="/help")
+        KeyboardButton(text="Помощь")
     ],
     [
-        KeyboardButton(text="/edit_profile")
+        KeyboardButton(text="Редактировать профиль")
     ],
     [
-        KeyboardButton(text="/set_offline")
+        KeyboardButton(text="Уйти в тень")
     ],
     [
         KeyboardButton(text="/stop")
@@ -86,8 +87,8 @@ edit_user_buttons = [
         KeyboardButton(text="/end_edit_profile")
     ]
 ]
-kb_online = ReplyKeyboardMarkup(keyboard=start_button_not_online, resize_keyboard=True, one_time_keyboard=False)
-kb_offline = ReplyKeyboardMarkup(keyboard=start_button_not_offline, resize_keyboard=True, one_time_keyboard=False)
+kb_online = ReplyKeyboardMarkup(keyboard=start_button_for_offline_user, resize_keyboard=True, one_time_keyboard=False)
+kb_offline = ReplyKeyboardMarkup(keyboard=start_button_for_online_user, resize_keyboard=True, one_time_keyboard=False)
 user_kb = ReplyKeyboardMarkup(keyboard=edit_user_buttons, resize_keyboard=True, one_time_keyboard=False)
 
 
@@ -291,7 +292,7 @@ def make_reg(message, age, picture_path):
         'capture': '-',
         'picture': picture_path,
         'old': age,
-        'disabled': False
+        'disabled': True
     }
     return d
 
@@ -334,6 +335,19 @@ async def start():
         poll_server_for_events(),
         dp.start_polling(bot)
     )
+
+
+@dp.message()
+async def test(message: types.Message):
+    print(message.text)
+    if message.text == "Помощь":
+        await bot_help(message)
+    elif message.text == "Редактировать профиль":
+        await edit_user_info(message)
+    elif message.text == "Выйти из тени":
+        await set_online(message)
+    elif message.text == "Уйти в тень":
+        await set_offline(message)
 
 
 if __name__ == "__main__":
