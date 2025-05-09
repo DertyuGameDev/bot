@@ -292,7 +292,7 @@ def make_reg(message, age, picture_path):
         'capture': '-',
         'picture': picture_path,
         'old': age,
-        'disabled': True
+        'disabled': 0
     }
     return d
 
@@ -335,19 +335,6 @@ async def start():
         poll_server_for_events(),
         dp.start_polling(bot)
     )
-
-
-@dp.message()
-async def test(message: types.Message):
-    print(message.text)
-    if message.text == "Помощь":
-        await bot_help(message)
-    elif message.text == "Редактировать профиль":
-        await edit_user_info(message)
-    elif message.text == "Выйти из тени":
-        await set_online(message)
-    elif message.text == "Уйти в тень":
-        await set_offline(message)
 
 
 if __name__ == "__main__":
