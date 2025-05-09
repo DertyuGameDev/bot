@@ -93,7 +93,11 @@ async def start(message: types.Message, state):
     if not data["exists"]:
         await ask_birthdate(message, state)
     else:
-        await prepare_link(message)
+        response = requests.post(f"{API_URL}/get_disabled", json={"user_id": message.from_user.id}).json()
+        if not response["disabled"]:
+            await prepare_link(message)
+        else:
+            await message.answer("Вы не в сети")
 
 
 @dp.message(Command("help"))
