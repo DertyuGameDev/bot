@@ -61,20 +61,20 @@ start_button_for_online_user = [
 ]
 edit_user_buttons = [
     [
-        KeyboardButton(text="/age")
+        KeyboardButton(text="Возраст👀")
 
     ],
     [
-        KeyboardButton(text="/name")
+        KeyboardButton(text="Имя🤷‍♂️")
     ],
     [
-        KeyboardButton(text="/picture")
+        KeyboardButton(text="Аватарка😜")
     ],
     [
-        KeyboardButton(text="/description")
+        KeyboardButton(text="Описание😎")
     ],
     [
-        KeyboardButton(text="/end_edit_profile")
+        KeyboardButton(text="Закончить редактирование✔")
     ]
 ]
 kb_online = ReplyKeyboardMarkup(keyboard=start_button_for_online_user, resize_keyboard=True, one_time_keyboard=False)
@@ -145,6 +145,7 @@ class WaitNewName(StatesGroup):
 @dp.message(WaitNewName.waiting_message)
 async def update_name(message: types.Message, state):
     name = message.text.rstrip()
+    print(name)
     res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"name": name}).json()
     await state.clear()
     await message.answer("Вы успешно сменили имя!")
@@ -323,15 +324,26 @@ async def start():
 
 
 @dp.message()
-async def test(message: types.Message):
-    if message.text == "Помощь":
+async def test(message: types.Message, state):
+    if message.text == "Помощь🚑":
         await bot_help(message)
-    elif message.text == "Редактировать профиль":
+    elif message.text == "Редактировать профиль🖌️":
         await edit_user_info(message)
-    elif message.text == "Выйти из тени":
+    elif message.text == "Выйти из тени🥷":
         await set_online(message)
-    elif message.text == "Уйти в тень":
+    elif message.text == "Уйти в тень🥷":
         await set_offline(message)
+    elif message.text == "Имя🤷‍♂️":
+        await edit_name(message, state)
+    elif message.text == "Возраст👀":
+        await edit_age(message, state)
+    elif message.text == "Аватарка😜":
+        await edit_picture(message, state)
+    elif message.text == "Описание😎":
+        await edit_description(message, state)
+    elif message.text == "Закончить редактирование✔":
+        await end_edit_profile(message, state)
+
 
 
 if __name__ == "__main__":
