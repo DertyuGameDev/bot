@@ -27,9 +27,8 @@ from aiohttp import web
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
-# API_URL = 'https://imminent-jet-suggestion.glitch.me'
-# API_URL = "https://cultured-ring-dog.glitch.me"
-API_URL = "http://127.0.0.1:5000"
+API_URL = 'https://chip-nasal-celsius.glitch.me'
+# API_URL = "http://127.0.0.1:5000"
 routes = web.RouteTableDef()
 start_button_for_offline_user = [
     [
@@ -324,13 +323,13 @@ async def start():
 
 @dp.message()
 async def test(message: types.Message):
-    if message.text == "Помощь":
+    if message.text == "Помощь🚑":
         await bot_help(message)
-    elif message.text == "Редактировать профиль":
+    elif message.text == "Редактировать профиль🖌️":
         await edit_user_info(message)
-    elif message.text == "Выйти из тени":
+    elif message.text == "Выйти из тени🥷":
         await set_online(message)
-    elif message.text == "Уйти в тень":
+    elif message.text == "Уйти в тень🥷":
         await set_offline(message)
 
 
