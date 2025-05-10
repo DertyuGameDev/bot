@@ -27,9 +27,8 @@ from aiohttp import web
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
-# API_URL = 'https://imminent-jet-suggestion.glitch.me'
-# API_URL = "https://cultured-ring-dog.glitch.me"
-API_URL = "http://127.0.0.1:5000"
+API_URL = 'https://chip-nasal-celsius.glitch.me'
+# API_URL = "http://127.0.0.1:5000"
 routes = web.RouteTableDef()
 start_button_for_offline_user = [
     [
@@ -145,7 +144,6 @@ class WaitNewName(StatesGroup):
 @dp.message(WaitNewName.waiting_message)
 async def update_name(message: types.Message, state):
     name = message.text.rstrip()
-    print(name)
     res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"name": name}).json()
     await state.clear()
     await message.answer("Вы успешно сменили имя!")
