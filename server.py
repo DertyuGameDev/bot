@@ -17,16 +17,12 @@ import asyncio
 import json
 import logging
 import urllib
-from datetime import datetime
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.filters.state import State, StatesGroup
-from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import ReplyKeyboardRemove
-from data.user import UserCard
 from config import BOT_TOKEN
-from data import db_session
 from aiohttp import web
 
 bot = Bot(token=BOT_TOKEN)
@@ -40,13 +36,13 @@ start_button_for_offline_user = [
         KeyboardButton(text="/start")
     ],
     [
-        KeyboardButton(text="Помощь")
+        KeyboardButton(text="Помощь🚑")
     ],
     [
-        KeyboardButton(text="Редактировать профиль")
+        KeyboardButton(text="Редактировать профиль🖌️")
     ],
     [
-        KeyboardButton(text="Выйти из тени")
+        KeyboardButton(text="Выйти из тени🥷")
     ]
 ]
 start_button_for_online_user = [
@@ -54,13 +50,13 @@ start_button_for_online_user = [
         KeyboardButton(text="/start")
     ],
     [
-        KeyboardButton(text="Помощь")
+        KeyboardButton(text="Помощь🚑")
     ],
     [
-        KeyboardButton(text="Редактировать профиль")
+        KeyboardButton(text="Редактировать профиль🖌️")
     ],
     [
-        KeyboardButton(text="Уйти в тень")
+        KeyboardButton(text="Уйти в тень🥷")
     ]
 ]
 edit_user_buttons = [
@@ -197,14 +193,14 @@ async def edit_description(message: types.Message, state):
 @dp.message(Command("set_online"))
 async def set_online(message: types.Message):
     res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": False}).json()
-    await message.answer("Описать, что произошло", reply_markup=ReplyKeyboardRemove())
+    await message.answer("Загрузка⚙️", reply_markup=ReplyKeyboardRemove())
     await message.answer("Теперь вас видят другие пользователи", reply_markup=kb_online)
 
 
 @dp.message(Command("set_offline"))
 async def set_offline(message: types.Message):
     res = requests.put(f"{API_URL}/edit_user/{message.from_user.id}", json={"disabled": True}).json()
-    await message.answer("Описать, что произошло", reply_markup=ReplyKeyboardRemove())
+    await message.answer("Загрузка⚙️", reply_markup=ReplyKeyboardRemove())
     await message.answer("Теперь вас не видят другие пользователи", reply_markup=kb_offline)
 
 
@@ -298,20 +294,11 @@ def make_reg(message, age, picture_path):
 async def get_user_avatar(message):
     user_id = message.from_user.id
     photos = await bot.get_user_profile_photos(user_id)
-    print(photos)
     if photos.total_count == 0:
         return 'static/img/default.jpg'
     file_id = photos.photos[0][-1].file_id
     file_info = await bot.get_file(file_id)
-
-    file_path = file_info.file_path
     file_name = f"static/img/{user_id}.jpg"
-
-    file = await bot.download_file(file_path)
-    print(requests.post(
-        f"{API_URL}/create_picture",
-        files={"file": (file_name, file, "image/jpg")}
-    ).text)
     return file_name
 
 
@@ -334,9 +321,9 @@ async def start():
         dp.start_polling(bot)
     )
 
+
 @dp.message()
 async def test(message: types.Message):
-    print(message.text)
     if message.text == "Помощь":
         await bot_help(message)
     elif message.text == "Редактировать профиль":
