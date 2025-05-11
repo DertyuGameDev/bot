@@ -27,7 +27,7 @@ from aiohttp import web
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
-API_URL = 'https://chip-nasal-celsius.glitch.me'
+API_URL = 'https://south-adhesive-waxflower.glitch.me'
 # API_URL = "http://127.0.0.1:5000"
 routes = web.RouteTableDef()
 start_button_for_offline_user = [
@@ -268,13 +268,16 @@ async def process_birthdate(message: types.Message, state):
     try:
         age = int(message.text.rstrip())
         if 6 > age or age > 100:
+            print(age)
             raise ValueError
         await message.answer(f"Спасибо! Погнали!")
         picture_path = await get_user_avatar(message)
         requests.post(f"{API_URL}/create_user", json=make_reg(message, age, picture_path))
+        requests.post(f"{API_URL}/create_picture", files={'file': picture_path})
         await state.clear()
         await prepare_link(message, new_user=True)
-    except ValueError:
+    except ValueError as e:
+        print(e)
         await message.answer("Возраст выходит за рамки или не является чилом. Введите еще раз.")
 
 
@@ -296,8 +299,13 @@ async def get_user_avatar(message):
     if photos.total_count == 0:
         return 'static/img/default.jpg'
     file_id = photos.photos[0][-1].file_id
-    file_info = await bot.get_file(file_id)
     file_name = f"static/img/{user_id}.jpg"
+    photo = await bot.get_file(file_id)
+    file_path = photo.file_path
+    file = await bot.download_file(file_path)
+    res = requests.post(f"{API_URL}/create_picture",
+                        files={"file": (file_name, file, "image/jpg")}
+                        ).text
     return file_name
 
 
@@ -341,7 +349,6 @@ async def test(message: types.Message, state):
         await edit_description(message, state)
     elif message.text == "Закончить редактирование✔":
         await end_edit_profile(message, state)
-
 
 
 if __name__ == "__main__":
